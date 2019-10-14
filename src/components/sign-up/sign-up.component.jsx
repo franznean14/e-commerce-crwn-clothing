@@ -1,30 +1,48 @@
-import React, { Component } from 'react'
+import React from 'react'
 
 import './sign-up.styles.scss'
 
 import FormInput from '../form-input/form-input.component';
+import CustomButton from '../custom-button/custom-button.component';
+import { auth, createUserProfileDocument } from '../../firebase/firebase.utils';
 
-export class SignIn extends Component {
+export class SignUp extends React.Component {
     constructor(props) {
         super(props)
     
         this.state = {
-            name: '',
-             email: '',
-             password: '',
-             confirmPassword: ''
+            displayName: '',
+            email: '',
+            password: '',
+            confirmPassword: ''
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
     
-    handleSubmit(e){
-        e.preventDefault();
-        this.setState({
-            email: '',
-            password: ''
-        })
+    handleSubmit = async event =>{
+        event.preventDefault();
+
+        const {displayName, email, password, confirmPassword} = this.state;
+
+        if(password !== confirmPassword){
+            alert("Password don't match")
+            return
+        }
+
+        try {
+            const { user } = await auth.createUserWithEmailAndPassword(email, password)
+            await createUserProfileDocument(user, {displayName})
+            this.setState({
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     handleChange(event){
@@ -35,49 +53,49 @@ export class SignIn extends Component {
     }
 
     render() {
+        const {displayName, email, password, confirmPassword} = this.state;
         return (
             <div className="sign-up">
                 <h2>I don't have an account</h2>
                 <span>Sign up with your email and password</span>
-
-                <form onSubmit={this.handleSubmit}>
+                <form className='sign-up-form' onSubmit={this.handleSubmit}>
                     <FormInput 
-                        name="name"
                         type='text'
-                        label='Name'
-                        value={this.state.email}
-                        required
+                        name='displayName'
+                        value={displayName}
+                        label='Display Name'
                         handleChange={this.handleChange}
+                        required
                     />
                     <FormInput 
-                        name="email"
-                        type='email'
+                        type='text'
+                        name='email'
+                        value={email}
                         label='Email'
-                        value={this.state.email}
-                        required
                         handleChange={this.handleChange}
+                        required
                     />
                     <FormInput 
-                        name="password"
                         type='password'
+                        name='password'
+                        value={password}
                         label='Password'
-                        value={this.state.password}
-                        required
                         handleChange={this.handleChange}
+                        required
                     />
                     <FormInput 
-                        name="confirm password"
                         type='password'
+                        name='confirmPassword'
+                        value={confirmPassword}
                         label='Confirm Password'
-                        value={this.state.password}
-                        required
                         handleChange={this.handleChange}
+                        required
                     />
-                    <input type='submit' value='Submit Form' />
+                    <CustomButton type='submit'>SIGN UP</CustomButton>
                 </form>
             </div>
         )
     }
 }
 
-export default SignIn
+export default SignUp;
