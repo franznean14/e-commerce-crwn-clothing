@@ -1,3 +1,4 @@
 export const shopActionTypes = {
     GET_COLLECTION: 'GET_COLLECTION',
+    UPDATE_COLLECTIONS: 'UPDATE_COLLECTIONS',
 }
